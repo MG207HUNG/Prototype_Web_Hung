@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home — Protocol</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="../../css/home-layout.css" />
+</head>
+<body>
+
+  <div id="site-nav"></div>
+
+  <div class="home-wrapper">
+    <!-- LEFT: Documents Section (75%) -->
+    <main class="documents-section">
+      <!-- Toolbar -->
+      <div class="doc-toolbar">
+        <div class="doc-toolbar-search">
+          <input id="search-q" type="search" placeholder="Search documents…" autocomplete="off">
+        </div>
+        <select id="type-filter" onchange="handleFilter()">
+          <option value="all">All Types</option>
+          <option value="Research Paper">Research Paper</option>
+          <option value="Thesis">Thesis</option>
+          <option value="Article">Article</option>
+          <option value="Report">Report</option>
+          <option value="General">General</option>
+        </select>
+        <input id="date-filter" type="date" onchange="handleFilter()" title="Filter by upload date">
+        <div class="view-toggle" role="group" aria-label="View mode">
+          <button class="view-btn active" id="btn-view-list" onclick="setView('list')" title="List view">☰</button>
+          <button class="view-btn" id="btn-view-grid" onclick="setView('grid')" title="Grid view">⊞</button>
+          <button class="view-btn" id="btn-view-compact" onclick="setView('compact')" title="Compact grid">⊟</button>
+        </div>
+        <button class="btn btn-primary btn-upload-open" onclick="openUpload()">＋ Upload</button>
+      </div>
+
+      <!-- Document list -->
+      <div class="list-card">
+        <div class="list-header">
+          <div class="list-title">Documents</div>
+          <span class="count-pill" id="count-pill">0 documents</span>
+        </div>
+        <div id="doc-list"></div>
+      </div>
+    </main>
+
+    <!-- RIGHT: Sidebar (25%) -->
+    <aside class="home-sidebar">
+
+      <!-- AI Tools Section -->
+      <section class="sidebar-card sidebar-ai">
+        <h3>🤖 AI Tools</h3>
+        <div class="ai-buttons">
+          <a href="../../pages/AIs">💬 AI Chat</a>
+          <a href="../../pages/AIs">🔍 Plagiarism Check</a>
+          <a href="../../pages/AIs">📚 References</a>
+          <a href="../../pages/AIs">📤 File Upload</a>
+        </div>
+      </section>
+
+      <!-- Forum Highlights Section -->
+      <section class="sidebar-card sidebar-forum">
+        <div class="card-header">
+          <h3>💬 Forum Highlights</h3>
+          <a href="../../pages/forum/forum.html" class="link-more">View All →</a>
+        </div>
+        <div class="posts-list" id="forum-posts">
+          <p class="posts-empty">Loading posts...</p>
+        </div>
+      </section>
+
+      <!-- Chat Preview Section -->
+      <section class="sidebar-card sidebar-chat">
+        <div class="card-header">
+          <h3>💬 Recent Chats</h3>
+          <a href="../../pages/chat/connects.html" class="link-more">Open →</a>
+        </div>
+        <div class="chat-preview" id="chat-preview">
+          <p class="chat-empty">No recent messages</p>
+        </div>
+        <a href="../../pages/chat/connects.html" class="chat-open-link">Open Chat</a>
+      </section>
+
+    </aside>
+  </div>
+
+  <!-- Upload Modal -->
+  <div id="upload-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="upload-modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="upload-modal-title">Upload Document</h2>
+        <button class="modal-close" onclick="closeUpload()" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="up-name">Document Title</label>
+          <input id="up-name" type="text" placeholder="Enter document title…">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="up-type">Document Type</label>
+            <select id="up-type">
+              <option value="General">General</option>
+              <option value="Research Paper">Research Paper</option>
+              <option value="Thesis">Thesis</option>
+              <option value="Article">Article</option>
+              <option value="Report">Report</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="up-univ">University / Institution</label>
+            <input id="up-univ" type="text" placeholder="e.g. VNU, MIT…">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="up-field">Field / Subject</label>
+          <input id="up-field" type="text" placeholder="e.g. Computer Science, Marketing…">
+        </div>
+        <div class="form-group">
+          <label for="up-description">Description <span style="font-weight:400;color:var(--clr-muted)">(optional)</span></label>
+          <textarea id="up-description" rows="3" placeholder="Brief description of this document…" style="width:100%;resize:vertical;padding:8px;border:1px solid var(--clr-border);border-radius:6px;background:var(--clr-bg);color:var(--clr-text);"></textarea>
+        </div>
+        <div class="form-group">
+          <label>File</label>
+          <div class="drop-zone" id="drop-zone"
+            onclick="document.getElementById('file-real').click()"
+            ondragover="event.preventDefault();this.classList.add('over')"
+            ondragleave="this.classList.remove('over')"
+            ondrop="handleDrop(event)">
+            <span class="drop-icon">📤</span>
+            <div class="drop-title">Click or drag &amp; drop</div>
+            <div class="drop-sub">PDF, DOCX, TXT, SAV…</div>
+            <div class="file-name-display" id="file-label"></div>
+          </div>
+          <input type="file" id="file-real" style="display:none" accept=".pdf,.docx,.doc,.txt,.sav,.spss,.xlsx,.csv" onchange="handleFile(this)">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeUpload()">Cancel</button>
+        <button class="btn btn-primary" onclick="handleUploadSubmit()">Upload</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script src="../../js/home.js"></script>
+
+</body>
+</html>
