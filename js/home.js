@@ -265,7 +265,7 @@ function renderForumPosts(posts) {
   }
   
   container.innerHTML = posts.map(post => `
-    <a href="../../pages/forum/forum.html?post=${post.id}" class="post-item">
+    <a href="./pages/forum/forum.html?post=${post.id}" class="post-item">
       <span class="post-title">${escapeHtml(post.title || 'Untitled')}</span>
       <span class="post-meta">${post.reply_count || 0} replies • ${getTimeAgo(post.created_at)}</span>
     </a>
